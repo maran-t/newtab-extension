@@ -961,22 +961,6 @@ body.cursor-hover .cursor-ring {
   }
 }
 
-/* ---------- Ink trail (persistent, sits behind the UI) ---------- */
-
-.trail-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 3px;
-  height: 3px;
-  margin: -1.5px 0 0 -1.5px;
-  border-radius: 50%;
-  background-color: var(--ink);
-  opacity: 0.22;
-  pointer-events: none;
-  z-index: 0;
-}
-
 /* ---------- Launch transition ---------- */
 
 .veil {

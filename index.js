@@ -246,35 +246,11 @@ let mouseY = innerHeight / 2;
 let ringX = mouseX;
 let ringY = mouseY;
 
-// Persistent ink trail: a dot every few pixels of travel, kept on the page.
-// Capped so the oldest dots recycle instead of the DOM growing without bound.
-const TRAIL_MAX = 600;
-const trailDots = [];
-let trailX = -100;
-let trailY = -100;
-
-function spawnTrailDot(x, y) {
-  const dot = document.createElement('div');
-  dot.className = 'trail-dot';
-  dot.style.translate = `${x}px ${y}px`;
-  document.body.appendChild(dot);
-  trailDots.push(dot);
-  if (trailDots.length > TRAIL_MAX) trailDots.shift().remove();
-}
-
 if (finePointer) {
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     document.body.classList.add('cursor-active');
-
-    const dx = mouseX - trailX;
-    const dy = mouseY - trailY;
-    if (dx * dx + dy * dy > 36) { // every ~6px of travel
-      trailX = mouseX;
-      trailY = mouseY;
-      spawnTrailDot(mouseX, mouseY);
-    }
   });
 
   document.addEventListener('mouseleave', () => {
