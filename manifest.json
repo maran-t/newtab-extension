@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "New Tab",
-  "description": "Helps to focus on your productivity without distraction.",
+  "description": "A minimal new tab with a live clock, focus timer, year progress, and your most-visited shortcuts. No clutter, no tracking.",
   "version": "1.0.1",
   "chrome_url_overrides": {
     "newtab": "index.html"
