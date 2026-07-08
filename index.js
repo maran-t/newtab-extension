@@ -167,10 +167,10 @@ async function searchHistory(query) {
 const MAX_SHORTCUTS = 8;
 
 const DEFAULT_SHORTCUTS = [
-  { title: 'Google', url: 'https://www.google.com', icon: 'logo/google.png' },
-  { title: 'LinkedIn', url: 'https://www.linkedin.com', icon: 'logo/linkedin.png' },
-  { title: 'GitHub', url: 'https://www.github.com', icon: 'logo/github.png' },
-  { title: 'Medium', url: 'https://www.medium.com', icon: 'logo/medium.png' }
+  { title: 'Google', url: 'https://www.google.com' },
+  { title: 'LinkedIn', url: 'https://www.linkedin.com' },
+  { title: 'GitHub', url: 'https://www.github.com' },
+  { title: 'Medium', url: 'https://www.medium.com' }
 ];
 
 const dockList = $('dock-list');
@@ -210,12 +210,11 @@ function monogramFor(item) {
 
 function iconFor(item) {
   // Icon sources, best first: Chrome's favicon service (extension only),
-  // a bundled logo if the item has one, then Google's public favicon
-  // service, then a letter monogram. Each failure falls through to the next.
+  // then Google's public favicon service, then a letter monogram.
+  // Each failure falls through to the next.
   const candidates = [];
   const fav = faviconUrl(item.url);
   if (fav) candidates.push(fav);
-  if (item.icon) candidates.push(item.icon);
   const host = hostOf(item.url);
   if (host.includes('.')) {
     candidates.push(`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`);
