@@ -7,32 +7,66 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 20px;
       line-height: 1.6;
+      color: #222;
     }
-    h1 {
+    h1, h2 {
       color: #333;
     }
-    p {
+    p, li {
+      margin-bottom: 12px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
       margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f7f7f7;
     }
   </style>
 </head>
 <body>
   <h1>Privacy Policy</h1>
 
-  <p>This privacy policy outlines the practices regarding the handling of user data for the <strong>New Tab</strong> Chrome extension. We are committed to ensuring that your privacy is protected.</p>
+  <p><em>Last updated: July 8, 2026</em></p>
+
+  <p>This privacy policy describes how the <strong>New Tab</strong> Chrome extension handles user data. The short version: everything runs locally in your browser, and we do not collect, store on any server, sell, or share any of your data.</p>
 
   <h2>No Data Collection</h2>
-  <p>The <strong>New Tab</strong> Chrome extension does <strong>not collect, store, or transmit</strong> any personal data, browsing history, or any form of user information. The extension operates entirely locally on your browser and does not interact with any external servers or services.</p>
+  <p>The extension has no backend, no accounts, no analytics, and no tracking. It does not transmit your personal data, browsing history, bookmarks, or usage information to the developer or to any third party.</p>
 
-  <h2>No Third-Party Services</h2>
-  <p>This extension does not use any third-party services or APIs that would result in data collection, sharing, or transmission. All functionality is performed locally within your browser.</p>
+  <h2>Permissions and How They Are Used</h2>
+  <p>The extension requests the following Chrome permissions. Each is used only to display your own data on your own new-tab page, on demand:</p>
+  <table>
+    <tr><th>Permission</th><th>Purpose</th></tr>
+    <tr><td><code>topSites</code></td><td>Fills the shortcut dock with your most-visited sites on first run, matching Chrome's default new-tab page. Read-only.</td></tr>
+    <tr><td><code>bookmarks</code></td><td>Lets you search your own bookmarks in the "Add shortcut" panel to pin a site to the dock. Read-only; bookmarks are never modified.</td></tr>
+    <tr><td><code>history</code></td><td>Lets you search your own browsing history in the "Add shortcut" panel to pin a previously visited site. Read-only; history is never modified.</td></tr>
+    <tr><td><code>favicon</code></td><td>Displays site icons for your shortcuts using Chrome's built-in favicon service.</td></tr>
+    <tr><td><code>storage</code></td><td>Saves your settings locally in your browser: your shortcut dock, an optional target date, your theme choice, and a running focus-timer session.</td></tr>
+  </table>
+  <p>Data read through these permissions is rendered on the new-tab page and goes nowhere else.</p>
 
-  <h2>User Consent and Permissions</h2>
-  <p>The extension may request certain permissions (such as access to specific websites or browser tabs), but these are only required for the extension to function as intended. None of these permissions involve the collection or sharing of personal data.</p>
+  <h2>Network Requests</h2>
+  <p>The extension makes no network requests, with one narrow exception: if Chrome's built-in favicon service cannot provide an icon for a shortcut, the extension may fetch that icon from Google's public favicon service (<code>google.com/s2/favicons</code>). This request contains only the domain name of the shortcut (for example, <code>github.com</code>) and no other information. No other external service is contacted.</p>
 
-  <h2>Contact Us</h2>
-  <p>If you have any questions or concerns about this privacy policy, feel free to contact us at <a href="mailto:maran.mallow@gmail.com">maran.mallow@gmail.com</a>.</p>
+  <h2>Data Retention and Deletion</h2>
+  <p>All settings live in your browser's local extension storage. Removing a shortcut or target date deletes it immediately, and uninstalling the extension removes all stored data. Nothing exists outside your browser to delete.</p>
+
+  <h2>Changes to This Policy</h2>
+  <p>If a future version of the extension changes how data is handled, this policy will be updated before that version is published.</p>
+
+  <h2>Contact</h2>
+  <p>If you have any questions or concerns about this privacy policy, contact <a href="mailto:maran.mallow@gmail.com">maran.mallow@gmail.com</a>.</p>
 </body>
 </html>
