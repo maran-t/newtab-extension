@@ -1,82 +1,774 @@
-html, body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
+/* ---------- Tokens ---------- */
+
+:root {
+  --paper: #FBFAF9;
+  --ink: #161513;
+  --muted: #8A8680;
+  --line: #E7E5E1;
+  --accent: #E23A28;
+  --chip-bg: #FFFFFF;
+  --chip-border: #ECEAE6;
+  --chip-shadow: 0 1px 2px rgba(22, 21, 19, 0.05), 0 4px 14px rgba(22, 21, 19, 0.06);
+  --chip-shadow-hover: 0 2px 4px rgba(22, 21, 19, 0.06), 0 10px 24px rgba(22, 21, 19, 0.12);
+  --veil-bg: rgba(251, 250, 249, 0.72);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #101011;
+    --ink: #F2F1EE;
+    --muted: #77746E;
+    --line: #232324;
+    --accent: #FF5A41;
+    --chip-bg: #F4F3F1;
+    --chip-border: #F4F3F1;
+    --chip-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.35);
+    --chip-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.45), 0 10px 26px rgba(0, 0, 0, 0.5);
+    --veil-bg: rgba(16, 16, 17, 0.72);
+  }
+}
+
+:root[data-theme="light"] {
+  --paper: #FBFAF9;
+  --ink: #161513;
+  --muted: #8A8680;
+  --line: #E7E5E1;
+  --accent: #E23A28;
+  --chip-bg: #FFFFFF;
+  --chip-border: #ECEAE6;
+  --chip-shadow: 0 1px 2px rgba(22, 21, 19, 0.05), 0 4px 14px rgba(22, 21, 19, 0.06);
+  --chip-shadow-hover: 0 2px 4px rgba(22, 21, 19, 0.06), 0 10px 24px rgba(22, 21, 19, 0.12);
+  --veil-bg: rgba(251, 250, 249, 0.72);
+}
+
+:root[data-theme="dark"] {
+  --paper: #101011;
+  --ink: #F2F1EE;
+  --muted: #77746E;
+  --line: #232324;
+  --accent: #FF5A41;
+  --chip-bg: #F4F3F1;
+  --chip-border: #F4F3F1;
+  --chip-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.35);
+  --chip-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.45), 0 10px 26px rgba(0, 0, 0, 0.5);
+  --veil-bg: rgba(16, 16, 17, 0.72);
+}
+
+/* ---------- Base ---------- */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
+  overflow: hidden;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+@media (pointer: fine) {
+  body,
+  body a,
+  body button {
     cursor: none;
-    color: black;
-    user-select: none;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
   }
+}
 
-  h1 {
-    font-size: 2em;
-    margin-bottom: 0.5em;
-  }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 
-  p {
-    display: inline;
-    font-size: 3.5em;
-  }
+/* ---------- Clock ---------- */
 
-  .cursor {
-    height: 10px;
-    width: 10px;
-    background-color: black;
-    border-radius: 50%;
-    position: absolute;
-  }
+.stage {
+  text-align: center;
+  transition: opacity 0.3s ease, transform 0.3s var(--ease-out);
+}
 
-  .app-link {
-    position: absolute;
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    padding: 10px;
-    border-radius: 50%;
-    /* z-index: -1; */
-    border: 2px solid rgb(238, 238, 238);
-    background-color: white;
-    cursor: none;
-    transition: background-color 0.3s;
-    margin-bottom: 5px;
-  }
+.date {
+  margin: 0 0 0.6em;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  animation: rise 0.7s var(--ease-out) 0.08s both;
+}
 
-  .app-link {
-    position: absolute;
-    right: 40px;
-  }
+.clock {
+  margin: 0;
+  font-size: clamp(4rem, 13vw, 10rem);
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  animation: rise 0.8s var(--ease-out) 0.16s both;
+}
 
-  .loader {
+.clock .ms {
+  font-size: 0.32em;
+  font-weight: 400;
+  color: var(--accent);
+  margin-left: 0.12em;
+}
+
+/* ---------- Greeting (vertical, left edge) ---------- */
+
+.greeting {
+  position: fixed;
+  left: 30px;
+  top: 50%;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg) translateY(50%);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  animation: fade 1s ease 0.5s both;
+  transition: opacity 0.3s ease;
+}
+
+/* ---------- Quick-link dock ---------- */
+
+.dock {
+  position: fixed;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: opacity 0.3s ease, transform 0.3s var(--ease-out);
+}
+
+.dock-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dock-item {
+  position: relative;
+  animation: rise 0.6s var(--ease-out) calc(0.34s + var(--i) * 0.07s) both;
+}
+
+.dock-item.no-anim {
+  animation: none;
+}
+
+.app-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  box-shadow: var(--chip-shadow);
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s ease;
+}
+
+.app-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+  object-fit: contain;
+}
+
+.monogram {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.app-link:hover .chip,
+.app-link:focus-visible .chip {
+  transform: translateX(-5px) scale(1.08);
+  box-shadow: var(--chip-shadow-hover);
+}
+
+.app-link:active .chip {
+  transform: translateX(-5px) scale(0.96);
+  transition-duration: 0.1s;
+}
+
+.app-label {
+  position: absolute;
+  right: calc(100% + 14px);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 0.25s ease, transform 0.25s var(--ease-out);
+  pointer-events: none;
+}
+
+.app-link:hover .app-label,
+.app-link:focus-visible .app-label,
+.dock-add:hover .app-label,
+.dock-add:focus-visible .app-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ---------- Remove button on dock items ---------- */
+
+.remove-btn {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--ink);
+  color: var(--paper);
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s ease, transform 0.2s var(--ease-out), background-color 0.2s ease;
+  z-index: 1;
+}
+
+.dock-item:hover .remove-btn,
+.remove-btn:focus-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.remove-btn:hover {
+  background-color: var(--accent);
+}
+
+/* ---------- Add-shortcut button ---------- */
+
+.dock-add {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  animation: rise 0.6s var(--ease-out) calc(0.34s + var(--i, 4) * 0.07s) both;
+}
+
+.add-chip {
+  background-color: transparent;
+  border: 1.5px dashed var(--line);
+  box-shadow: none;
+}
+
+.plus {
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+
+.plus::before,
+.plus::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: currentColor;
+  transition: background-color 0.2s ease;
+}
+
+.plus::before {
+  width: 14px;
+  height: 1.5px;
+  transform: translate(-50%, -50%);
+}
+
+.plus::after {
+  width: 1.5px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+}
+
+.dock-add:hover {
+  color: var(--ink);
+}
+
+.dock-add:hover .add-chip,
+.dock-add:focus-visible .add-chip {
+  border-color: var(--muted);
+  transform: translateX(-5px) scale(1.08);
+}
+
+/* ---------- Add-shortcut panel ---------- */
+
+.panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--veil-bg);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 1100;
+}
+
+.panel {
+  position: fixed;
+  right: 96px;
+  top: 50%;
+  width: 340px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--chip-shadow-hover);
+  opacity: 0;
+  transform: translateY(-50%) translateX(12px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.3s var(--ease-out);
+  z-index: 1200;
+}
+
+body.panel-open .panel-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.panel-open .panel {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  pointer-events: auto;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 10px;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.panel-close:hover {
+  color: var(--ink);
+  background-color: var(--line);
+}
+
+.panel-search {
+  margin: 0 18px 6px;
+  padding: 10px 0;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.25s ease;
+}
+
+.panel-search::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+.panel-search:focus {
+  border-bottom-color: var(--accent);
+}
+
+.panel-notice {
+  margin: 8px 18px 0;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.panel-list {
+  overflow-y: auto;
+  padding: 10px 8px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.panel-section-label {
+  margin: 12px 10px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-section-label:first-child {
+  margin-top: 2px;
+}
+
+.panel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.panel-row:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--line) 55%, transparent);
+}
+
+.panel-row:disabled {
+  opacity: 0.45;
+}
+
+.row-icon {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+}
+
+.row-icon img {
+  width: 14px;
+  height: 14px;
+  display: block;
+  object-fit: contain;
+}
+
+.row-icon .monogram {
+  font-size: 11px;
+}
+
+.row-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.row-title {
+  display: block;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-host {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-state {
+  flex: none;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.row-state.is-added {
+  color: var(--accent);
+}
+
+.panel-empty {
+  margin: 14px 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ---------- Theme toggle ---------- */
+
+.theme-toggle {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  animation: fade 1s ease 0.7s both;
+  transition: color 0.25s ease, opacity 0.3s ease;
+}
+
+.theme-toggle .glyph {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  background: linear-gradient(90deg, currentColor 0 50%, transparent 50%);
+  transition: transform 0.5s var(--ease-out);
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+}
+
+.theme-toggle:hover .glyph {
+  transform: rotate(180deg);
+}
+
+/* ---------- Custom cursor ---------- */
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background-color: var(--ink);
+}
+
+.cursor-ring {
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border: 1.5px solid var(--muted);
+  scale: 1;
+  transition: opacity 0.3s ease, scale 0.3s var(--ease-out), border-color 0.25s ease;
+}
+
+body.cursor-active .cursor-dot,
+body.cursor-active .cursor-ring {
+  opacity: 1;
+}
+
+body.cursor-hover .cursor-ring {
+  scale: 1.5;
+  border-color: var(--accent);
+}
+
+@media (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
     display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 30px;
-    height: 30px;
-    border: 5px solid #000;
-    border-top: 5px solid transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    transform: translate(-50%, -50%);
-    z-index: 11111;
+  }
+}
+
+/* ---------- Launch transition ---------- */
+
+.veil {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--veil-bg);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 999;
+}
+
+.launch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  transform: translateY(8px);
+  transition: transform 0.35s var(--ease-out);
+}
+
+body.leaving .launch {
+  transform: translateY(0);
+}
+
+.launch-dial {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.launch-dial::before,
+.launch-dial::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+}
+
+.launch-dial::after {
+  border-color: transparent;
+  border-top-color: var(--accent);
+}
+
+body.leaving .launch-dial::after {
+  animation: spin 0.9s linear infinite;
+}
+
+.launch-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+#launch-host {
+  color: var(--ink);
+}
+
+body.leaving .veil {
+  opacity: 1;
+}
+
+body.leaving .stage,
+body.leaving .dock {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+body.leaving .dock {
+  transform: translateY(-50%) translateX(10px);
+}
+
+body.leaving .greeting,
+body.leaving .theme-toggle {
+  /* Drop the filled entrance animation so its opacity:1 stops overriding this fade-out. */
+  animation: none;
+  opacity: 0;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .date,
+  .clock,
+  .greeting,
+  .dock-item,
+  .dock-add,
+  .theme-toggle {
+    animation: none;
   }
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  .stage,
+  .dock,
+  .chip,
+  .app-label,
+  .cursor-ring,
+  .remove-btn,
+  .panel,
+  .panel-backdrop,
+  .launch,
+  .theme-toggle .glyph {
+    transition: none;
   }
 
-  .backdrop {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgb(255 255 255 / 50%);
-    z-index: 998;
+  body.leaving .launch-dial::after {
+    animation: none;
   }
+}

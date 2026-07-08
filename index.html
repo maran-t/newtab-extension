@@ -4,41 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Tab</title>
-    
+    <script src="theme.js"></script>
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
-    <h1 style="position: absolute; top: 80px; left: 10px; transform: rotate(-90deg);">Hello,</h1>
+    <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+    <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
 
-    <div style="height: 26px; width: 24px; background-color: black; position: absolute; left: 0px; bottom: 24%; cursor: pointer; z-index: 1;"></div>
-   
-    <div id="loader" class="loader"></div>
-    <div id="backdrop" class="backdrop"></div>
+    <span class="greeting" id="greeting">Hello</span>
 
-    <div class="ico" style="z-index: 1;">
-      <a href="https://www.google.com" class="app-link ico" style="bottom: 40px;">
-        <img src="logo/google.png" alt="Google" class="app-icon ico">
-      </a>
-    
-      <a href="https://www.linkedin.com" class="app-link ico" style="bottom: 100px;">
-        <img src="logo/linkedin.png" alt="LinkedIn" class="app-icon ico">
-      </a>
-    
-      <a href="https://www.github.com" class="app-link ico" style="bottom: 160px;">
-        <img src="logo/github.png" alt="GitHub" class="app-icon ico">
-      </a>
-    
-      <a href="https://www.medium.com" class="app-link ico" style="bottom: 220px;">
-        <img src="logo/medium.png" alt="Medium" class="app-icon ico">
-      </a>
+    <main class="stage" id="stage">
+      <p class="date" id="date"></p>
+      <h1 class="clock">
+        <span id="time">00:00:00</span><span class="ms" id="ms">.000</span>
+      </h1>
+    </main>
+
+    <nav class="dock" id="dock" aria-label="Shortcuts">
+      <div class="dock-list" id="dock-list"></div>
+      <button class="dock-add" id="dock-add" aria-label="Add shortcut" title="Add shortcut">
+        <span class="app-label">Add</span>
+        <span class="chip add-chip"><span class="plus" aria-hidden="true"></span></span>
+      </button>
+    </nav>
+
+    <div class="panel-backdrop" id="panel-backdrop"></div>
+    <section class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Add shortcut">
+      <header class="panel-head">
+        <h2 class="panel-title">Add shortcut</h2>
+        <button class="panel-close" id="panel-close" aria-label="Close">&times;</button>
+      </header>
+      <input
+        class="panel-search"
+        id="panel-search"
+        type="text"
+        placeholder="Search bookmarks &amp; history, or paste a URL"
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <p class="panel-notice" id="panel-notice" hidden>The dock is full — remove a shortcut first.</p>
+      <div class="panel-list" id="panel-list"></div>
+    </section>
+
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
+      <span class="glyph" aria-hidden="true"></span>
+    </button>
+
+    <div class="veil" id="veil" aria-hidden="true">
+      <div class="launch">
+        <span class="launch-dial"></span>
+        <p class="launch-label">Opening <span id="launch-host"></span></p>
+      </div>
     </div>
 
-    <div id="cursor-p" class="cursor" style="top: -20px; left: 0; z-index: 1"></div>
-    <div style="z-index: 1;">
-      <p id="date"></p>
-      <p style="margin-left: 28px;"></p>
-      <span id="time"></span>
-    </div>
     <script src="index.js"></script>
   </body>
 </html>
