@@ -45,11 +45,13 @@ function updateClock(now) {
 
 // ---------- Focus timer ----------
 
-const clockEl = $('clock');
+const pusherBtn = $('pusher');
 const timerControls = $('timer-controls');
 const presetBtns = [...document.querySelectorAll('.preset')];
-const controlsUnit = document.querySelector('.controls-unit');
+const presetRow = $('preset-row');
+const actionRow = $('action-row');
 const startBtn = $('timer-start');
+const cancelBtn = $('timer-cancel');
 const endBtn = $('timer-end');
 const yearEl = $('year');
 const sessionEl = $('session');
@@ -78,12 +80,11 @@ function enterSetup() {
   timerMode = 'setup';
   dateEl.textContent = `Focus session · now ${hhmm(new Date())}`;
   showSetupTime();
-  presetBtns.forEach((b) => { b.hidden = false; });
-  controlsUnit.hidden = false;
-  startBtn.hidden = false;
+  presetRow.hidden = false;
+  actionRow.hidden = false;
   endBtn.hidden = true;
   timerControls.hidden = false;
-  clockEl.setAttribute('aria-label', 'Cancel focus session setup');
+  pusherBtn.hidden = true; // the controls block takes its spot
 }
 
 function beginRun(endsAt) {
@@ -92,9 +93,9 @@ function beginRun(endsAt) {
   sessionBuiltMinute = -1;
   lastTimerSecond = -1;
   lastNowMinute = -1;
-  presetBtns.forEach((b) => { b.hidden = true; });
-  controlsUnit.hidden = true;
-  startBtn.hidden = true;
+  presetRow.hidden = true;
+  actionRow.hidden = true;
+  pusherBtn.hidden = true;
   endBtn.hidden = false;
   timerControls.hidden = false;
   yearEl.hidden = true;
@@ -117,7 +118,7 @@ function exitTimer() {
   lastSecond = -1;
   lastDay = -1;
   document.title = 'New Tab';
-  clockEl.setAttribute('aria-label', 'Start a focus session');
+  pusherBtn.hidden = false;
 }
 
 function finishTimer() {
@@ -168,18 +169,11 @@ function updateTimer(now) {
   if (remaining <= 0) finishTimer();
 }
 
-clockEl.addEventListener('click', () => {
+pusherBtn.addEventListener('click', () => {
   if (timerMode === 'clock') enterSetup();
-  else if (timerMode === 'setup') exitTimer();
 });
 
-clockEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();
-    if (timerMode === 'setup') startTimer();
-    else clockEl.click();
-  }
-});
+cancelBtn.addEventListener('click', exitTimer);
 
 presetBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -204,11 +198,22 @@ const yearPct = $('year-pct');
 
 let yearCache = { year: -1, week: -1, start: 0, span: 1 };
 
+function targetWeekIndex() {
+  if (!target) return -1;
+  const [y, m, d] = target.date.split('-').map(Number);
+  const t = new Date(y, m - 1, d).getTime();
+  if (t < yearCache.start || t >= yearCache.start + yearCache.span) return -1;
+  return Math.min(WEEKS - 1, Math.floor(((t - yearCache.start) / yearCache.span) * WEEKS));
+}
+
 function buildTicks(week) {
+  const targetWeek = targetWeekIndex();
   yearTicks.textContent = '';
   for (let i = 0; i < WEEKS; i++) {
     const tick = document.createElement('span');
-    tick.className = 'tick' + (i < week ? ' past' : i === week ? ' cur' : '');
+    tick.className =
+      'tick' + (i < week ? ' past' : i === week ? ' cur' : '') + (i === targetWeek ? ' target' : '');
+    if (i === targetWeek) tick.title = target.label;
     tick.style.setProperty('--i', i);
     yearTicks.appendChild(tick);
   }
@@ -746,12 +751,14 @@ cdForm.addEventListener('submit', (e) => {
   target = { label, date: cdDate.value };
   store.set('target', target);
   renderCountdown();
+  yearCache.week = -1; // rebuild the timeline so the target marker appears
 });
 
 cdRemove.addEventListener('click', () => {
   target = null;
   store.set('target', null);
   renderCountdown();
+  yearCache.week = -1;
 });
 
 // ---------- Theme toggle ----------
@@ -787,6 +794,7 @@ $('theme-toggle').addEventListener('click', () => {
 
   if (savedTarget && savedTarget.label && savedTarget.date) {
     target = savedTarget;
+    yearCache.week = -1; // ensure the timeline marker renders after async load
   }
   renderCountdown();
 })();

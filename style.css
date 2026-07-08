@@ -21,8 +21,8 @@
     --muted: #77746E;
     --line: #232324;
     --accent: #FF5A41;
-    --chip-bg: #F4F3F1;
-    --chip-border: #F4F3F1;
+    --chip-bg: #1D1D1F;
+    --chip-border: #2C2C2E;
     --chip-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.35);
     --chip-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.45), 0 10px 26px rgba(0, 0, 0, 0.5);
     --veil-bg: rgba(16, 16, 17, 0.72);
@@ -50,8 +50,8 @@
   --muted: #77746E;
   --line: #232324;
   --accent: #FF5A41;
-  --chip-bg: #F4F3F1;
-  --chip-border: #F4F3F1;
+  --chip-bg: #1D1D1F;
+  --chip-border: #2C2C2E;
   --chip-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.35);
   --chip-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.45), 0 10px 26px rgba(0, 0, 0, 0.5);
   --veil-bg: rgba(16, 16, 17, 0.72);
@@ -124,6 +124,7 @@ body {
 }
 
 .clock {
+  position: relative;
   margin: 0;
   font-size: clamp(4rem, 13vw, 10rem);
   font-weight: 200;
@@ -132,6 +133,42 @@ body {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   animation: rise 0.8s var(--ease-out) 0.16s both;
+}
+
+/* Chronograph pusher: the start button at the clock's "2 o'clock".
+   Fixed to the viewport so it stays put when the display width changes. */
+.pusher {
+  position: fixed;
+  left: calc(50% + min(445px, 23.2vw));
+  top: calc(39vh - 56px);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  animation: fade 1s ease 0.4s both;
+  transition: color 0.2s ease, transform 0.15s var(--ease-out), opacity 0.3s ease;
+}
+
+.pusher svg {
+  width: 21px;
+  height: 21px;
+}
+
+.pusher:hover {
+  color: var(--ink);
+}
+
+.pusher:active {
+  transform: translateY(2px);
+}
+
+.pusher.is-active {
+  color: var(--accent);
 }
 
 .clock .ms {
@@ -595,10 +632,30 @@ body.panel-open .panel {
 }
 
 .year-ticks .tick {
+  position: relative;
   width: 1.5px;
   height: 12px;
   background-color: var(--line);
   animation: tick-in 0.5s var(--ease-out) calc(0.5s + var(--i) * 0.012s) both;
+}
+
+/* Target-date marker: an index on the bezel */
+.year-ticks .tick.target {
+  width: 2px;
+  height: 20px;
+  background-color: var(--ink);
+}
+
+.year-ticks .tick.target::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--ink);
 }
 
 .year-ticks .tick.past {
@@ -644,18 +701,34 @@ body.panel-open .panel {
 
 /* ---------- Focus timer ---------- */
 
+/* Control block to the right of the numerals, centered on their midline */
 .timer-controls {
+  position: fixed;
+  left: calc(50% + min(240px, 18.5vw));
+  top: 39vh;
+  transform: translateY(-50%);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 18px;
-  margin-top: 30px;
-  animation: rise 0.5s var(--ease-out) both;
+  gap: 16px;
+  animation: controls-rise 0.5s var(--ease-out) both;
+}
+
+@keyframes controls-rise {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-50% + 14px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
 }
 
 .preset,
 .timer-start,
 .timer-end,
+.timer-cancel,
 .cd-save,
 .cd-remove {
   padding: 4px 2px;
@@ -673,6 +746,7 @@ body.panel-open .panel {
 
 .preset:hover,
 .timer-end:hover,
+.timer-cancel:hover,
 .cd-remove:hover {
   color: var(--ink);
 }
@@ -692,14 +766,16 @@ body.panel-open .panel {
   color: var(--ink);
 }
 
-.controls-unit {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-  opacity: 0.6;
-  margin-right: 8px;
+.preset-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .time-up {
@@ -967,6 +1043,7 @@ body.leaving .dock {
 
 body.leaving .greeting,
 body.leaving .theme-toggle,
+body.leaving .pusher,
 body.leaving .year {
   /* Drop the filled entrance animation so its opacity:1 stops overriding this fade-out. */
   animation: none;
@@ -1005,6 +1082,8 @@ body.leaving .year {
   .dock-add,
   .year,
   .year-ticks .tick,
+  .pusher,
+  .timer-controls,
   .theme-toggle {
     animation: none;
   }

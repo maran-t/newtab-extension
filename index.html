@@ -15,19 +15,32 @@
 
     <main class="stage" id="stage">
       <p class="date" id="date"></p>
-      <h1 class="clock" id="clock" role="button" tabindex="0" aria-label="Start a focus session" title="Start a focus session">
+      <h1 class="clock" id="clock">
         <span id="time">00:00:00</span><span class="ms" id="ms">.000</span>
       </h1>
       <div class="timer-controls" id="timer-controls" hidden>
-        <button class="preset" data-min="15">15</button>
-        <button class="preset is-selected" data-min="25">25</button>
-        <button class="preset" data-min="45">45</button>
-        <button class="preset" data-min="60">60</button>
-        <span class="controls-unit">min</span>
-        <button class="timer-start" id="timer-start">Start</button>
-        <button class="timer-end" id="timer-end" hidden>End session</button>
+        <div class="preset-row" id="preset-row">
+          <button class="preset" data-min="15" aria-label="15 minutes">15</button>
+          <button class="preset is-selected" data-min="25" aria-label="25 minutes">25</button>
+          <button class="preset" data-min="45" aria-label="45 minutes">45</button>
+          <button class="preset" data-min="60" aria-label="60 minutes">60</button>
+        </div>
+        <div class="action-row" id="action-row">
+          <button class="timer-start" id="timer-start">Start</button>
+          <button class="timer-cancel" id="timer-cancel">Cancel</button>
+        </div>
+        <button class="timer-end" id="timer-end" hidden>End</button>
       </div>
     </main>
+
+    <button class="pusher" id="pusher" aria-label="Start a focus session" title="Start a focus session">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="13.5" r="8"></circle>
+        <path d="M12 13.5V9.5"></path>
+        <path d="M9.5 2.5h5"></path>
+        <path d="M12 2.5v3"></path>
+      </svg>
+    </button>
 
     <div class="year" id="year" aria-label="Year progress">
       <div class="year-ticks" id="year-ticks"></div>
