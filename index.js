@@ -90,11 +90,33 @@ let mouseY = innerHeight / 2;
 let ringX = mouseX;
 let ringY = mouseY;
 
+// Ink trail: a dot every few pixels of travel, fading out and removing itself.
+let trailX = -100;
+let trailY = -100;
+
+function spawnTrailDot(x, y) {
+  const dot = document.createElement('div');
+  dot.className = 'trail-dot';
+  dot.style.translate = `${x}px ${y}px`;
+  dot.addEventListener('animationend', () => dot.remove());
+  document.body.appendChild(dot);
+}
+
 if (finePointer) {
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     document.body.classList.add('cursor-active');
+
+    if (!reducedMotion) {
+      const dx = mouseX - trailX;
+      const dy = mouseY - trailY;
+      if (dx * dx + dy * dy > 100) { // every ~10px of travel
+        trailX = mouseX;
+        trailY = mouseY;
+        spawnTrailDot(mouseX, mouseY);
+      }
+    }
   });
 
   document.addEventListener('mouseleave', () => {

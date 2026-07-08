@@ -716,6 +716,33 @@ body.cursor-hover .cursor-ring {
   }
 }
 
+/* ---------- Mouse trail ---------- */
+
+.trail-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background-color: var(--ink);
+  pointer-events: none;
+  z-index: 9998;
+  animation: trail-fade 0.9s ease-out forwards;
+}
+
+@keyframes trail-fade {
+  from {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
 /* ---------- Launch transition ---------- */
 
 .veil {
