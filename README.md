@@ -10,7 +10,7 @@ A minimal, chronograph-inspired new-tab page for Chrome. Helps you focus on your
 - **Year progress** — 52 hairline week ticks under the clock: past weeks in ink, the current week pulsing in red, with a live percentage of the year elapsed.
 - **Dynamic shortcuts** — the dock on the right seeds itself from your most-visited sites (the same shortcuts Chrome's default new tab shows). Add more from your bookmarks and history, or paste any URL; remove any shortcut on hover. Your dock is saved locally.
 - **Light & dark themes** — follows your system preference, with a manual toggle (bottom-left) that persists.
-- **Motion** — staggered entrance choreography, a trailing two-part custom cursor with an ink dot trail, slide-out labels on the dock, and an on-theme launch transition when opening a shortcut. All animation respects `prefers-reduced-motion`.
+- **Motion** — staggered entrance choreography, a trailing two-part custom cursor, slide-out labels on the dock, and an on-theme launch transition when opening a shortcut. All animation respects `prefers-reduced-motion`.
 
 ## Permissions
 
