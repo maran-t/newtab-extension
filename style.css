@@ -97,6 +97,9 @@ body {
 
 .stage {
   text-align: center;
+  /* Lift the clock lockup slightly above true center to balance the year row below. */
+  position: relative;
+  top: -11vh;
   transition: opacity 0.3s ease, transform 0.3s var(--ease-out);
 }
 
@@ -550,6 +553,85 @@ body.panel-open .panel {
   color: var(--muted);
 }
 
+/* ---------- Year progress ---------- */
+
+.year {
+  /* Centered in the band between the clock (vertical center) and the bottom edge. */
+  position: fixed;
+  left: 50%;
+  top: 70%;
+  transform: translate(-50%, -50%);
+  width: min(880px, 78vw);
+  animation: year-rise 0.8s var(--ease-out) 0.26s both;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes year-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 16px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.year-ticks {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 20px;
+}
+
+.year-ticks .tick {
+  width: 1.5px;
+  height: 12px;
+  background-color: var(--line);
+  animation: tick-in 0.5s var(--ease-out) calc(0.5s + var(--i) * 0.012s) both;
+}
+
+.year-ticks .tick.past {
+  background-color: var(--ink);
+}
+
+.year-ticks .tick.cur {
+  width: 2px;
+  height: 20px;
+  background-color: var(--accent);
+  animation:
+    tick-in 0.5s var(--ease-out) calc(0.5s + var(--i) * 0.012s) both,
+    tick-pulse 1.8s ease-in-out 1.6s infinite;
+}
+
+.year-label {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.year-label .year-week {
+  color: var(--ink);
+}
+
+@keyframes tick-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes tick-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 /* ---------- Theme toggle ---------- */
 
 .theme-toggle {
@@ -715,7 +797,8 @@ body.leaving .dock {
 }
 
 body.leaving .greeting,
-body.leaving .theme-toggle {
+body.leaving .theme-toggle,
+body.leaving .year {
   /* Drop the filled entrance animation so its opacity:1 stops overriding this fade-out. */
   animation: none;
   opacity: 0;
@@ -751,6 +834,8 @@ body.leaving .theme-toggle {
   .greeting,
   .dock-item,
   .dock-add,
+  .year,
+  .year-ticks .tick,
   .theme-toggle {
     animation: none;
   }

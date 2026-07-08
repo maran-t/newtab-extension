@@ -42,6 +42,44 @@ function updateClock(now) {
   greetingEl.textContent = greetingFor(now.getHours());
 }
 
+// ---------- Year progress (52-week tick row) ----------
+
+const WEEKS = 52;
+
+const yearTicks = $('year-ticks');
+const yearNum = $('year-num');
+const yearWeek = $('year-week');
+const yearPct = $('year-pct');
+
+let yearCache = { year: -1, week: -1, start: 0, span: 1 };
+
+function buildTicks(week) {
+  yearTicks.textContent = '';
+  for (let i = 0; i < WEEKS; i++) {
+    const tick = document.createElement('span');
+    tick.className = 'tick' + (i < week ? ' past' : i === week ? ' cur' : '');
+    tick.style.setProperty('--i', i);
+    yearTicks.appendChild(tick);
+  }
+}
+
+function updateYearProgress(now) {
+  const year = now.getFullYear();
+  if (year !== yearCache.year) {
+    const start = new Date(year, 0, 1).getTime();
+    yearCache = { year, week: -1, start, span: new Date(year + 1, 0, 1).getTime() - start };
+    yearNum.textContent = year;
+  }
+  const frac = (now.getTime() - yearCache.start) / yearCache.span;
+  const week = Math.min(WEEKS - 1, Math.floor(frac * WEEKS));
+  if (week !== yearCache.week) {
+    yearCache.week = week;
+    buildTicks(week);
+    yearWeek.textContent = `Week ${week + 1}`;
+  }
+  yearPct.textContent = `${(frac * 100).toFixed(4)}%`;
+}
+
 // ---------- Custom cursor (dot follows instantly, ring trails) ----------
 
 const dot = $('cursor-dot');
@@ -71,7 +109,9 @@ if (finePointer) {
 // ---------- Single animation loop ----------
 
 function frame() {
-  updateClock(new Date());
+  const now = new Date();
+  updateClock(now);
+  updateYearProgress(now);
 
   if (finePointer) {
     if (reducedMotion) {
