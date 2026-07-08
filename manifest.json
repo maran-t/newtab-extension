@@ -1,0 +1,11 @@
+{
+    "manifest_version": 3,
+    "name": "New Tab",
+    "description": "Helps to focus on your productivity without distraction.",
+    "version": "1.0",
+    "chrome_url_overrides": {
+      "newtab": "index.html"
+    },
+    "permissions": []
+  }
+  
