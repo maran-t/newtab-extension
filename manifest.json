@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "New Tab",
   "description": "Helps to focus on your productivity without distraction.",
-  "version": "2.1",
+  "version": "1.0.1",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
