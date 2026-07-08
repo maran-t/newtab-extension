@@ -1,4 +1,4 @@
-/* ---------- Tokens ---------- */
+﻿/* ---------- Tokens ---------- */
 
 :root {
   --paper: #FBFAF9;
@@ -30,6 +30,7 @@
 }
 
 :root[data-theme="light"] {
+  color-scheme: light;
   --paper: #FBFAF9;
   --ink: #161513;
   --muted: #8A8680;
@@ -43,6 +44,7 @@
 }
 
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --paper: #101011;
   --ink: #F2F1EE;
   --muted: #77746E;
@@ -59,6 +61,14 @@
 
 * {
   box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+:root {
+  color-scheme: light dark;
 }
 
 html,
@@ -630,6 +640,165 @@ body.panel-open .panel {
 @keyframes tick-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+/* ---------- Focus timer ---------- */
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 30px;
+  animation: rise 0.5s var(--ease-out) both;
+}
+
+.preset,
+.timer-start,
+.timer-end,
+.cd-save,
+.cd-remove {
+  padding: 4px 2px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1.5px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.preset:hover,
+.timer-end:hover,
+.cd-remove:hover {
+  color: var(--ink);
+}
+
+.preset.is-selected {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.timer-start,
+.cd-save {
+  color: var(--accent);
+}
+
+.timer-start:hover,
+.cd-save:hover {
+  color: var(--ink);
+}
+
+.controls-unit {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.6;
+  margin-right: 8px;
+}
+
+.time-up {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background-color: var(--veil-bg);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+body.timer-done .time-up {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.time-up h2 {
+  margin: 0;
+  font-size: clamp(3rem, 9vw, 7rem);
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+
+.time-up p {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Target-date countdown ---------- */
+
+.countdown {
+  display: block;
+  margin: 18px auto 0;
+  padding: 2px 4px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.countdown b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.countdown.ghost {
+  opacity: 0.4;
+}
+
+.countdown:hover {
+  color: var(--ink);
+  opacity: 1;
+}
+
+.countdown-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.countdown-form input {
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--ink);
+  padding: 4px 0;
+  outline: none;
+  transition: border-color 0.25s ease;
+}
+
+.countdown-form input::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+.countdown-form input:focus {
+  border-bottom-color: var(--accent);
 }
 
 /* ---------- Theme toggle ---------- */

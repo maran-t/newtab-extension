@@ -38,9 +38,160 @@ function updateClock(now) {
     dateEl.textContent = now.toLocaleDateString('en-US', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
+    renderCountdown();
   }
   greetingEl.textContent = greetingFor(now.getHours());
 }
+
+// ---------- Focus timer ----------
+
+const clockEl = $('clock');
+const timerControls = $('timer-controls');
+const presetBtns = [...document.querySelectorAll('.preset')];
+const controlsUnit = document.querySelector('.controls-unit');
+const startBtn = $('timer-start');
+const endBtn = $('timer-end');
+const yearEl = $('year');
+const sessionEl = $('session');
+const sessionTicksEl = $('session-ticks');
+const sessionLeftEl = $('session-left');
+const timeUpEl = $('time-up');
+const timeUpSub = $('time-up-sub');
+
+let timerMode = 'clock'; // 'clock' | 'setup' | 'running' | 'done'
+let timerMinutes = 25;
+let timerEndsAt = 0;
+let sessionBuiltMinute = -1;
+let lastTimerSecond = -1;
+let lastNowMinute = -1;
+
+function hhmm(date) {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function showSetupTime() {
+  timeEl.textContent = `${String(timerMinutes).padStart(2, '0')}:00`;
+  msEl.textContent = '';
+}
+
+function enterSetup() {
+  timerMode = 'setup';
+  dateEl.textContent = `Focus session · now ${hhmm(new Date())}`;
+  showSetupTime();
+  presetBtns.forEach((b) => { b.hidden = false; });
+  controlsUnit.hidden = false;
+  startBtn.hidden = false;
+  endBtn.hidden = true;
+  timerControls.hidden = false;
+  clockEl.setAttribute('aria-label', 'Cancel focus session setup');
+}
+
+function beginRun(endsAt) {
+  timerMode = 'running';
+  timerEndsAt = endsAt;
+  sessionBuiltMinute = -1;
+  lastTimerSecond = -1;
+  lastNowMinute = -1;
+  presetBtns.forEach((b) => { b.hidden = true; });
+  controlsUnit.hidden = true;
+  startBtn.hidden = true;
+  endBtn.hidden = false;
+  timerControls.hidden = false;
+  yearEl.hidden = true;
+  sessionEl.hidden = false;
+}
+
+function startTimer() {
+  const endsAt = Date.now() + timerMinutes * 60000;
+  store.set('focusTimer', { endsAt, minutes: timerMinutes });
+  beginRun(endsAt);
+}
+
+function exitTimer() {
+  timerMode = 'clock';
+  store.set('focusTimer', null);
+  document.body.classList.remove('timer-done');
+  timerControls.hidden = true;
+  yearEl.hidden = false;
+  sessionEl.hidden = true;
+  lastSecond = -1;
+  lastDay = -1;
+  document.title = 'New Tab';
+  clockEl.setAttribute('aria-label', 'Start a focus session');
+}
+
+function finishTimer() {
+  timerMode = 'done';
+  store.set('focusTimer', null);
+  timeUpSub.textContent = `${timerMinutes} min focus complete · click to dismiss`;
+  document.body.classList.add('timer-done');
+  document.title = 'Time! · New Tab';
+}
+
+function buildSessionTicks(elapsedMin) {
+  sessionTicksEl.textContent = '';
+  for (let i = 0; i < timerMinutes; i++) {
+    const tick = document.createElement('span');
+    tick.className = 'tick' + (i < elapsedMin ? ' past' : i === elapsedMin ? ' cur' : '');
+    tick.style.setProperty('--i', i);
+    sessionTicksEl.appendChild(tick);
+  }
+}
+
+function updateTimer(now) {
+  const remaining = Math.max(0, timerEndsAt - now.getTime());
+  const totalSec = Math.ceil(remaining / 1000);
+  const mm = Math.floor(totalSec / 60);
+  const ss = totalSec % 60;
+  msEl.textContent = '.' + Math.floor((remaining % 1000) / 100);
+
+  if (totalSec !== lastTimerSecond) {
+    lastTimerSecond = totalSec;
+    const text = `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+    timeEl.textContent = text;
+    sessionLeftEl.textContent = `${text} left`;
+    document.title = `${text} · Focus`;
+  }
+
+  // Keep the wall clock visible while focusing: it lives in the eyebrow line.
+  if (now.getMinutes() !== lastNowMinute) {
+    lastNowMinute = now.getMinutes();
+    dateEl.textContent = `Now ${hhmm(now)} · focus ends ${hhmm(new Date(timerEndsAt))}`;
+  }
+
+  const elapsedMin = Math.min(timerMinutes - 1, Math.floor((timerMinutes * 60000 - remaining) / 60000));
+  if (elapsedMin !== sessionBuiltMinute) {
+    sessionBuiltMinute = elapsedMin;
+    buildSessionTicks(elapsedMin);
+  }
+
+  if (remaining <= 0) finishTimer();
+}
+
+clockEl.addEventListener('click', () => {
+  if (timerMode === 'clock') enterSetup();
+  else if (timerMode === 'setup') exitTimer();
+});
+
+clockEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    if (timerMode === 'setup') startTimer();
+    else clockEl.click();
+  }
+});
+
+presetBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    timerMinutes = Number(btn.dataset.min);
+    presetBtns.forEach((b) => b.classList.toggle('is-selected', b === btn));
+    showSetupTime();
+  });
+});
+
+startBtn.addEventListener('click', startTimer);
+endBtn.addEventListener('click', exitTimer);
+timeUpEl.addEventListener('click', exitTimer);
 
 // ---------- Year progress (52-week tick row) ----------
 
@@ -102,7 +253,7 @@ if (finePointer) {
   });
 
   document.addEventListener('mouseover', (e) => {
-    document.body.classList.toggle('cursor-hover', !!e.target.closest('a, button'));
+    document.body.classList.toggle('cursor-hover', !!e.target.closest('a, button, [role="button"]'));
   });
 }
 
@@ -110,7 +261,8 @@ if (finePointer) {
 
 function frame() {
   const now = new Date();
-  updateClock(now);
+  if (timerMode === 'running') updateTimer(now);
+  else if (timerMode === 'clock') updateClock(now);
   updateYearProgress(now);
 
   if (finePointer) {
@@ -510,7 +662,11 @@ panelClose.addEventListener('click', closePanel);
 panelBackdrop.addEventListener('click', closePanel);
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && document.body.classList.contains('panel-open')) closePanel();
+  if (e.key !== 'Escape') return;
+  if (document.body.classList.contains('panel-open')) closePanel();
+  else if (!cdForm.hidden) closeCountdownForm();
+  else if (timerMode === 'done') exitTimer();
+  else if (timerMode === 'setup' || timerMode === 'running') exitTimer();
 });
 
 let searchTimer;
@@ -529,6 +685,75 @@ panelSearch.addEventListener('keydown', async (e) => {
   }
 });
 
+// ---------- Target-date countdown ----------
+
+const cdBtn = $('countdown');
+const cdForm = $('countdown-form');
+const cdLabel = $('countdown-label');
+const cdDate = $('countdown-date');
+const cdRemove = $('countdown-remove');
+
+let target = null; // { label, date: 'YYYY-MM-DD' }
+
+function renderCountdown() {
+  cdForm.hidden = true;
+  cdBtn.hidden = false;
+  cdBtn.textContent = '';
+
+  if (!target) {
+    cdBtn.classList.add('ghost');
+    cdBtn.textContent = '+ Set a target date';
+    return;
+  }
+
+  cdBtn.classList.remove('ghost');
+  const [y, m, d] = target.date.split('-').map(Number);
+  const now = new Date();
+  const days = Math.round(
+    (new Date(y, m - 1, d) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5
+  );
+
+  const strong = document.createElement('b');
+  if (days > 0) {
+    strong.textContent = `${days} day${days === 1 ? '' : 's'}`;
+    cdBtn.append(`${target.label} in `, strong);
+  } else if (days === 0) {
+    strong.textContent = 'today';
+    cdBtn.append(`${target.label} is `, strong);
+  } else {
+    strong.textContent = `${-days} day${days === -1 ? '' : 's'}`;
+    cdBtn.append(`${target.label} was `, strong, ' ago');
+  }
+}
+
+function closeCountdownForm() {
+  renderCountdown();
+}
+
+cdBtn.addEventListener('click', () => {
+  cdBtn.hidden = true;
+  cdForm.hidden = false;
+  cdLabel.value = target ? target.label : '';
+  cdDate.value = target ? target.date : '';
+  cdRemove.hidden = !target;
+  cdLabel.focus();
+});
+
+cdForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const label = cdLabel.value.trim();
+  if (!label || !cdDate.value) return;
+  target = { label, date: cdDate.value };
+  store.set('target', target);
+  renderCountdown();
+});
+
+cdRemove.addEventListener('click', () => {
+  target = null;
+  store.set('target', null);
+  renderCountdown();
+});
+
 // ---------- Theme toggle ----------
 
 $('theme-toggle').addEventListener('click', () => {
@@ -544,3 +769,24 @@ $('theme-toggle').addEventListener('click', () => {
     // Theme still applies for this tab; it just won't persist.
   }
 });
+
+// ---------- Restore persisted state (runs last: `store` is defined above) ----------
+
+(async function restoreState() {
+  const [savedTimer, savedTarget] = await Promise.all([
+    store.get('focusTimer'),
+    store.get('target')
+  ]);
+
+  if (savedTimer && savedTimer.endsAt > Date.now()) {
+    timerMinutes = savedTimer.minutes;
+    beginRun(savedTimer.endsAt);
+  } else if (savedTimer) {
+    store.set('focusTimer', null);
+  }
+
+  if (savedTarget && savedTarget.label && savedTarget.date) {
+    target = savedTarget;
+  }
+  renderCountdown();
+})();

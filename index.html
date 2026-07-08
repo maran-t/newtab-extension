@@ -15,17 +15,46 @@
 
     <main class="stage" id="stage">
       <p class="date" id="date"></p>
-      <h1 class="clock">
+      <h1 class="clock" id="clock" role="button" tabindex="0" aria-label="Start a focus session" title="Start a focus session">
         <span id="time">00:00:00</span><span class="ms" id="ms">.000</span>
       </h1>
+      <div class="timer-controls" id="timer-controls" hidden>
+        <button class="preset" data-min="15">15</button>
+        <button class="preset is-selected" data-min="25">25</button>
+        <button class="preset" data-min="45">45</button>
+        <button class="preset" data-min="60">60</button>
+        <span class="controls-unit">min</span>
+        <button class="timer-start" id="timer-start">Start</button>
+        <button class="timer-end" id="timer-end" hidden>End session</button>
+      </div>
     </main>
 
-    <div class="year" aria-label="Year progress">
+    <div class="year" id="year" aria-label="Year progress">
       <div class="year-ticks" id="year-ticks"></div>
       <p class="year-label">
         <span id="year-num"></span>
         <span><span class="year-week" id="year-week"></span> · <span class="year-pct" id="year-pct"></span></span>
       </p>
+      <button class="countdown" id="countdown" hidden></button>
+      <form class="countdown-form" id="countdown-form" hidden>
+        <input id="countdown-label" type="text" placeholder="Label — e.g. Launch" maxlength="24" autocomplete="off" spellcheck="false">
+        <input id="countdown-date" type="date" aria-label="Target date">
+        <button type="submit" class="cd-save">Save</button>
+        <button type="button" class="cd-remove" id="countdown-remove" hidden>Remove</button>
+      </form>
+    </div>
+
+    <div class="year session" id="session" aria-label="Focus session" hidden>
+      <div class="year-ticks" id="session-ticks"></div>
+      <p class="year-label">
+        <span>Focus</span>
+        <span class="year-week" id="session-left"></span>
+      </p>
+    </div>
+
+    <div class="time-up" id="time-up" role="alert">
+      <h2>Time.</h2>
+      <p id="time-up-sub"></p>
     </div>
 
     <nav class="dock" id="dock" aria-label="Shortcuts">
